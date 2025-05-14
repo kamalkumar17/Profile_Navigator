@@ -58,47 +58,46 @@ const AdminForm = () => {
   }, [id, getProfile, isEditing, navigate]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    
-    if (name.includes('.')) {
-      const [parent, child] = name.split('.');
-      
-      if (parent === 'location' && child === 'coordinates') {
-        const [coord, val] = name.split('.')[2];
-        setFormData({
-          ...formData,
-          location: {
-            ...formData.location,
-            coordinates: {
-              ...formData.location.coordinates,
-              [coord]: value
-            }
-          }
-        });
-      } else if (parent === 'social') {
-        setFormData({
-          ...formData,
-          social: {
-            ...formData.social,
-            [child]: value
-          }
-        });
-      } else if (parent === 'location') {
-        setFormData({
-          ...formData,
-          location: {
-            ...formData.location,
-            [child]: value
-          }
-        });
+  const { name, value } = e.target;
+
+  if (name === 'location.coordinates.lat' || name === 'location.coordinates.lng') {
+    const coordKey = name.split('.').pop(); // will be 'lat' or 'lng'
+    setFormData(prev => ({
+      ...prev,
+      location: {
+        ...prev.location,
+        coordinates: {
+          ...prev.location.coordinates,
+          [coordKey]: value
+        }
       }
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value
-      });
-    }
-  };
+    }));
+  } else if (name.startsWith('social.')) {
+    const socialKey = name.split('.').pop();
+    setFormData(prev => ({
+      ...prev,
+      social: {
+        ...prev.social,
+        [socialKey]: value
+      }
+    }));
+  } else if (name.startsWith('location.')) {
+    const locKey = name.split('.').pop();
+    setFormData(prev => ({
+      ...prev,
+      location: {
+        ...prev.location,
+        [locKey]: value
+      }
+    }));
+  } else {
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  }
+};
+
 
   const validateForm = () => {
     const errors = {};
